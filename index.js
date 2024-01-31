@@ -1,4 +1,7 @@
 const dogData = document.querySelector('.data')
+const btnNext = document.getElementById('next')
+
+let page = 0
 
 const getBreedsConfig = {
     method: 'GET',
@@ -29,4 +32,28 @@ async function getAllDogBreeds() {
     }
 }
 
-getAllDogBreeds()
+async function get5DogObjects() {
+    try {
+        const res = await fetch(
+            `https://api.thedogapi.com/v1/breeds?limit=5&page=${page}`,
+            getBreedsConfig
+        )
+        const dogs = await res.json()
+
+        dogs.forEach((dog) => {
+            const paragraph = document.createElement('p')
+            paragraph.textContent = `Name: ${dog.name} Id: ${dog.id}`
+            dogData.appendChild(paragraph)
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+btnNext.addEventListener('click', () => {
+    ++page
+    get5DogObjects()
+})
+
+// getAllDogBreeds()
+// get5DogObjects()
