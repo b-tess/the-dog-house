@@ -11,6 +11,7 @@ const btnPrev = document.getElementById('prev')
 const dogData = document.querySelector('.data')
 let allBreedsArrayLength
 let copyOfDogsArray
+let added
 
 let page = 0
 
@@ -19,6 +20,26 @@ const getBreedsConfig = {
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        'x-api-key':
+            'live_RccA1xjRZi83cXhCxXEAUzBSAcNGtBepp8AenZHiUmMScC2it42WhVD3zyYJGDoe',
+    },
+}
+
+const addToFavoritesConfig = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'x-api-key':
+            'live_RccA1xjRZi83cXhCxXEAUzBSAcNGtBepp8AenZHiUmMScC2it42WhVD3zyYJGDoe',
+    },
+    body: {},
+}
+
+const removeConfig = {
+    method: 'DELETE',
+    headers: {
+        'Content-Type': 'application/json',
         'x-api-key':
             'live_RccA1xjRZi83cXhCxXEAUzBSAcNGtBepp8AenZHiUmMScC2it42WhVD3zyYJGDoe',
     },
@@ -99,6 +120,33 @@ async function get5DogObjects() {
     }
 }
 
+//Add an image to favorites data
+async function addedToFavs(id) {
+    //Get the image id to help add it to favorites database
+    const imageId = {
+        image_id: id,
+    }
+
+    //Pass the id in the body of the post request
+    addToFavoritesConfig.body = JSON.stringify(imageId)
+    const response = await fetch(
+        'https://api.thedogapi.com/v1/favourites',
+        addToFavoritesConfig
+    )
+    const data = await response.json()
+    // console.log(added)
+    return data.id
+}
+
+//Remove an image from favorites data
+async function removeFromFavs(id) {
+    const deleted = await fetch(
+        `https://api.thedogapi.com/v1/favourites/${id}`,
+        removeConfig
+    )
+    return deleted
+}
+
 //Abstract the dispersal of returned data to relevant elements using context
 function disperseData(container) {
     // container.children[0].setAttribute('id', `${this.id}`)
@@ -140,6 +188,7 @@ function displayMoreInfo(container) {
     container.children[1].textContent = this.name
     container.children[2].setAttribute('src', `${this.image.url}`)
     container.children[2].setAttribute('alt', `${this.name}`)
+    container.children[3].setAttribute('id', `${this.id}`)
     //Placeholder for objects without origin data
     if (this.origin === '' || this.origin === undefined) {
         container.children[4].textContent = 'Origin: unknown'
@@ -200,9 +249,17 @@ closeIcon.addEventListener('click', () => {
 })
 
 //Toggle the styling of the like-icon
+//Use th icon to add or remove an image from the favorites list
 const likeIconClasses = likeIcon.classList
-likeIcon.addEventListener('click', () => {
-    likeIconClasses.toggle('add-to-favorites')
+likeIcon.addEventListener('click', async (e) => {
+    const addToFavorites = likeIconClasses.toggle('add-to-favorites')
+    if (addToFavorites) {
+        added = await addedToFavs(e.target.parentElement.id)
+        console.log(added)
+    } else {
+        const removed = await removeFromFavs(added)
+        console.log(removed)
+    }
 })
 
 // getAllDogBreeds()
