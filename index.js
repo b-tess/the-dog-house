@@ -1,6 +1,9 @@
 const nameImageContainer = document.querySelectorAll('.name-image')
 const moreInfoContainer = document.querySelector('.more-info-container')
-const dogImages = document.querySelectorAll('.name-image img')
+// const dogImages = document.querySelectorAll('.name-image img')
+const moreInfoIcons = document.querySelectorAll('.name-image .more-info-icon i')
+const closeIcon = document.getElementById('close-icon')
+const likeIcon = document.getElementById('like-icon')
 const main = document.querySelector('main')
 const imagesContainer = document.querySelector('.images-container')
 const btnNext = document.getElementById('next')
@@ -98,11 +101,12 @@ async function get5DogObjects() {
 
 //Abstract the dispersal of returned data to relevant elements using context
 function disperseData(container) {
-    container.children[0].setAttribute('id', `${this.id}`)
+    // container.children[0].setAttribute('id', `${this.id}`)
     container.children[0].setAttribute('src', `${this.image.url}`)
     container.children[0].setAttribute('alt', `${this.name}`)
-    container.children[1].setAttribute('id', `${this.id}`)
+    // container.children[1].setAttribute('id', `${this.id}`)
     container.children[1].textContent = this.name
+    container.children[2].setAttribute('id', `${this.id}`)
 }
 
 //Clear the info in the elements without data on the last page
@@ -133,16 +137,22 @@ function binarySearch(array, id) {
 }
 
 function displayMoreInfo(container) {
-    container.children[0].textContent = this.name
-    container.children[1].setAttribute('src', `${this.image.url}`)
-    container.children[1].setAttribute('alt', `${this.name}`)
-    container.children[2].textContent = `Origin: ${this.origin}`
-    container.children[3].textContent = `Life Expectancy: ${this.life_span}`
-    container.children[4].textContent = `Bred For: ${this.bred_for}`
-    container.children[5].textContent = `Temperament: ${this.temperament}`
+    container.children[1].textContent = this.name
+    container.children[2].setAttribute('src', `${this.image.url}`)
+    container.children[2].setAttribute('alt', `${this.name}`)
+    //Placeholder for objects without origin data
+    if (this.origin === '' || this.origin === undefined) {
+        container.children[4].textContent = 'Origin: unknown'
+    } else {
+        container.children[4].textContent = `Origin: ${this.origin}`
+    }
+
+    container.children[5].textContent = `Life Expectancy: ${this.life_span}`
+    container.children[6].textContent = `Bred For: ${this.bred_for}`
+    container.children[7].textContent = `Temperament: ${this.temperament}`
 }
 
-btnNext.addEventListener('click', (e) => {
+btnNext.addEventListener('click', () => {
     ++page
     get5DogObjects()
 
@@ -164,19 +174,35 @@ btnPrev.addEventListener('click', () => {
     // }
 })
 
-dogImages.forEach((image) => {
-    image.addEventListener('click', (e) => {
+moreInfoIcons.forEach((icon) => {
+    icon.addEventListener('click', (e) => {
         //Add a class that affects the page layout
         main.classList.add('display-more-data')
         moreInfoContainer.classList.add('display-more-data')
         imagesContainer.classList.add('display-more-data')
         //Find correct element in the array
-        const dogDataObj = binarySearch(copyOfDogsArray, e.target.id)
+        const dogDataObj = binarySearch(
+            copyOfDogsArray,
+            e.target.parentElement.id
+        )
         // console.log(`Data obj: ${dogDataObj}`)
 
         //Populate the relevant data
         displayMoreInfo.call(dogDataObj, moreInfoContainer)
     })
+})
+
+//Remove the display-more-data styling on container close
+closeIcon.addEventListener('click', () => {
+    main.classList.remove('display-more-data')
+    moreInfoContainer.classList.remove('display-more-data')
+    imagesContainer.classList.remove('display-more-data')
+})
+
+//Toggle the styling of the like-icon
+const likeIconClasses = likeIcon.classList
+likeIcon.addEventListener('click', () => {
+    likeIconClasses.toggle('add-to-favorites')
 })
 
 // getAllDogBreeds()

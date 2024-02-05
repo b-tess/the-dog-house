@@ -66,3 +66,32 @@ main.display-more-data {
 .name-image img {
     width: 150px;
 }
+
+.dog-name,
+.more-info-icon {
+    text-align: center;
+}
+
+.more-info-icon i,
+#close-icon,
+#like-icon {
+    cursor: pointer;
+}
+
+/* Close more info container icon */
+.more-info-container p:first-child {
+    /* text-align: right; */
+    align-self: flex-end;
+}
+
+#close-icon:hover {
+    color: #ff0000;
+}
+
+.more-info-container img {
+    width: 400px;
+}
+
+#like-icon.add-to-favorites {
+    color: #ff0000;
+}
