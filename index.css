@@ -95,3 +95,23 @@ main.display-more-data {
 #like-icon.add-to-favorites {
     color: #ff0000;
 }
+
+/* Style the favorites area */
+.show-favorites {
+    width: 100%;
+    position: relative;
+    padding: 10px auto;
+}
+
+#favorites-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.display-favorites {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
