@@ -24,12 +24,35 @@ h1 {
     padding-left: 10px;
 }
 
+button {
+    padding: 5px;
+    border-radius: 11px;
+    border: 2px solid #fad2d2;
+    background-color: #fafad280;
+}
+
+.favorites-data button {
+    background-color: #fad2d2;
+    border: 1px solid #d2fafa;
+}
+
+section.button-container {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+
+img {
+    border-radius: 5px;
+}
+
 /* Elements that'll be affected by the display-more-data shift */
 main {
     display: grid;
     grid-template-rows: 1fr;
     grid-template-columns: 1fr;
     gap: 10px;
+    margin-bottom: 30px;
 }
 
 main.display-more-data {
@@ -49,18 +72,41 @@ main.display-more-data {
 
 .images-container {
     display: flex;
-    /* gap: 10px; */
     justify-content: space-evenly;
+    width: 100%;
 }
 
 .images-container.display-more-data {
     flex-direction: column;
+}
+
+.render-favorites {
+    display: none;
+}
+
+.render-favorites.display-more-data {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-top: 20px;
 }
 /* End of those elements */
 
 .data {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.name-image {
+    min-width: 170px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 3px 8px 1px #778899b3;
+    border-radius: 3px;
 }
 
 .name-image img {
@@ -78,7 +124,8 @@ main.display-more-data {
     cursor: pointer;
 }
 
-/* Close more info container icon */
+/* more-info-container area */
+/* Close more-info-container icon */
 .more-info-container p:first-child {
     /* text-align: right; */
     align-self: flex-end;
@@ -100,7 +147,7 @@ main.display-more-data {
 .show-favorites {
     width: 100%;
     position: relative;
-    padding: 10px auto;
+    padding: 20px;
 }
 
 #favorites-button {
@@ -108,10 +155,4 @@ main.display-more-data {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-.display-favorites {
-    display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr 1fr 1fr;
 }
