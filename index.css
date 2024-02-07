@@ -59,7 +59,10 @@ main.display-more-data {
     grid-template-columns: 1fr 2fr;
 }
 
-.more-info-container {
+.more-info-container,
+.render-favorites,
+.render-favorites.display-more-data div:nth-child(1),
+.favorites-data.no-data {
     display: none;
 }
 
@@ -78,10 +81,7 @@ main.display-more-data {
 
 .images-container.display-more-data {
     flex-direction: column;
-}
-
-.render-favorites {
-    display: none;
+    gap: 10px;
 }
 
 .render-favorites.display-more-data {
@@ -155,4 +155,31 @@ main.display-more-data {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+/* Render-favorites container when there are no favorites to show */
+.render-favorites.no-favorites {
+    display: block;
+}
+
+.render-favorites.no-favorites div:nth-child(2),
+.render-favorites.no-favorites div:nth-child(3),
+.render-favorites.no-favorites div:nth-child(4) {
+    display: none;
+}
+
+.render-favorites.no-favorites div:nth-child(1) p {
+    text-align: center;
+}
+/* End of that condition */
+
+.favorites-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.favorites-data img {
+    width: 40%;
 }

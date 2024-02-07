@@ -1,11 +1,12 @@
-const nameImageContainer = document.querySelectorAll('.name-image')
+const nameImageContainers = document.querySelectorAll('.name-image')
 const moreInfoContainer = document.querySelector('.more-info-container')
+const imagesContainer = document.querySelector('.images-container')
+const favoritesContainers = document.getElementsByClassName('favorites-data')
+const renderFavsContainer = document.querySelector('.render-favorites')
 const moreInfoIcons = document.querySelectorAll('.name-image .more-info-icon i')
 const closeIcon = document.getElementById('close-icon')
 const likeIcon = document.getElementById('like-icon')
 const main = document.querySelector('main')
-const imagesContainer = document.querySelector('.images-container')
-const favoritesContainers = document.getElementsByClassName('favorites-data')
 const btnNext = document.getElementById('next')
 const btnPrev = document.getElementById('prev')
 const showFavsBtn = document.getElementById('favorites-button')
@@ -79,7 +80,7 @@ async function get5DogObjects() {
         copyOfDogsArray = [...dogs] //This will help populate the more-info section in HTML
         let index = 0
 
-        nameImageContainer.forEach(function (container) {
+        nameImageContainers.forEach(function (container) {
             if (page === lastPage && !dogs[index]) {
                 clearBreedsData(container)
             } else {
@@ -136,7 +137,7 @@ async function removeFromFavs(id) {
 
 //Get three of the available favorites objects to help with
 //rendering them.
-async function get3Favs() {
+async function getFavs() {
     try {
         const response = await fetch(
             'https://api.thedogapi.com/v1/favourites?limit=3',
@@ -210,9 +211,10 @@ function disperseFavsData(container) {
 
 //Clear the favorites data on click of remove button
 function clearFavsData(container) {
-    container.children[0].setAttribute('src', '')
-    container.children[0].setAttribute('alt', '')
-    container.children[1].setAttribute('id', '')
+    // container.children[0].setAttribute('src', '')
+    // container.children[0].setAttribute('alt', '')
+    // container.children[1].setAttribute('id', '')
+    container.classList.add('no-data')
 }
 
 btnNext.addEventListener('click', () => {
@@ -231,6 +233,9 @@ moreInfoIcons.forEach((icon) => {
         main.classList.add('display-more-data')
         moreInfoContainer.classList.add('display-more-data')
         imagesContainer.classList.add('display-more-data')
+        // nameImageContainers.forEach((container) =>
+        //     container.classList.add('display-more-data')
+        // )
         //Find correct element in the array to help with dispersing the data
         const dogDataObj = binarySearch(
             copyOfDogsArray,
@@ -246,6 +251,9 @@ closeIcon.addEventListener('click', () => {
     main.classList.remove('display-more-data')
     moreInfoContainer.classList.remove('display-more-data')
     imagesContainer.classList.remove('display-more-data')
+    // nameImageContainers.forEach((container) =>
+    //     container.classList.remove('display-more-data')
+    // )
 })
 
 //Toggle the styling of the like-icon
@@ -264,7 +272,14 @@ likeIcon.addEventListener('click', async (e) => {
 
 //Display the favorites data on button click
 showFavsBtn.addEventListener('click', async () => {
-    const favsData = await get3Favs()
+    const favsData = await getFavs()
+    if (favsData.length === 0) {
+        renderFavsContainer.classList.add('no-favorites')
+        return
+    } else {
+        renderFavsContainer.classList.remove('no-favorites')
+        renderFavsContainer.classList.add('display-more-data')
+    }
     let favsObj = {
         image: {
             url: '',
@@ -272,22 +287,36 @@ showFavsBtn.addEventListener('click', async () => {
         },
         favId: '',
     }
-    console.log(favsData)
-    console.log(favoritesContainers)
+    // console.log('favs data', favsData)
+    // console.log(favoritesContainers)
 
     //The favs data returned doesn't seem to have the image property needed
     //to disperse the data correctly.
     //Solution: populate a large array on page load when getAllDogBreeds is
     //called. Call binarySearch on this array to find the correct object,
     //get the image info from this object.
-    favsData.forEach((dataObj, index) => {
-        let binarySearchObj = binarySearch(allBreedsArray, dataObj.image_id)
-        favsObj.image.url = binarySearchObj.image.url
-        favsObj.image.alt = binarySearchObj.image.alt
-        favsObj.favId = dataObj.id
 
-        disperseFavsData.call(favsObj, favoritesContainers[index])
-    })
+    //A for loop helps with styling when the favsData array is < 3 elements
+    //The empty containers should have a display: none
+
+    for (let i = 0; i < 3; i++) {
+        if (favsData[i]) {
+            if (favoritesContainers[i].classList.contains('no-data')) {
+                favoritesContainers[i].classList.remove('no-data')
+            }
+            let binarySearchObj = binarySearch(
+                allBreedsArray,
+                favsData[i].image_id
+            )
+            favsObj.image.url = binarySearchObj.image.url
+            favsObj.image.alt = binarySearchObj.image.alt
+            favsObj.favId = favsData[i].id
+
+            disperseFavsData.call(favsObj, favoritesContainers[i])
+        } else {
+            favoritesContainers[i].classList.add('no-data')
+        }
+    }
 })
 
 //Remove a favorite on button click
