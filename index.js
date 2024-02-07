@@ -12,6 +12,7 @@ const btnPrev = document.getElementById('prev')
 const showFavsBtn = document.getElementById('favorites-button')
 const removeFavsBtns = document.querySelectorAll('.favorites-data button')
 const dogData = document.querySelector('.data')
+const spinner = document.getElementById('spinner')
 let allBreedsArray
 let copyOfDogsArray
 let added
@@ -48,6 +49,14 @@ const removeConfig = {
     },
 }
 
+function isLoading(loading = true) {
+    if (loading) {
+        spinner.classList.add('is-loading')
+    } else {
+        spinner.classList.remove('is-loading')
+    }
+}
+
 async function getAllDogBreeds() {
     try {
         const res = await fetch(
@@ -64,6 +73,7 @@ async function getAllDogBreeds() {
 
 async function get5DogObjects() {
     try {
+        isLoading(true)
         //Get all breeds only once on page laod to get the
         //length of the array of results
         //This will help with pagination
@@ -96,6 +106,8 @@ async function get5DogObjects() {
         page === lastPage
             ? btnNext.setAttribute('disabled', '')
             : btnNext.removeAttribute('disabled')
+
+        isLoading(false)
     } catch (error) {
         console.log(error)
     }
@@ -125,28 +137,37 @@ async function addedToFavs(id) {
 //Remove an image from favorites data
 async function removeFromFavs(id) {
     try {
-        const deleted = await fetch(
+        isLoading(true)
+        if (likeIcon.classList.contains('add-to-favorites')) {
+            likeIcon.classList.remove('add-to-favorites')
+        }
+        await fetch(
             `https://api.thedogapi.com/v1/favourites/${id}`,
             removeConfig
         )
-        return deleted
+        // return deleted
     } catch (error) {
         console.log(error)
     }
+
+    isLoading(false)
 }
 
 //Get three of the available favorites objects to help with
 //rendering them.
 async function getFavs() {
     try {
+        isLoading(true)
         const response = await fetch(
             'https://api.thedogapi.com/v1/favourites?limit=3',
             getBreedsConfig
         )
         const data = await response.json()
+        isLoading(false)
         return data
     } catch (error) {
         console.log(error)
+        isLoading(false)
     }
 }
 
@@ -242,6 +263,8 @@ moreInfoIcons.forEach((icon) => {
             e.target.parentElement.id
         )
 
+        // console.log(dogDataObj)
+
         disperseMoreInfo.call(dogDataObj, moreInfoContainer)
     })
 })
@@ -256,6 +279,14 @@ closeIcon.addEventListener('click', () => {
     // )
 })
 
+closeIcon.addEventListener('mouseover', () => {
+    closeIcon.classList.add('mouse-over')
+})
+
+closeIcon.addEventListener('mouseout', () => {
+    closeIcon.classList.remove('mouse-over')
+})
+
 //Toggle the styling of the like-icon
 //Use th icon to add or remove an image from the favorites list
 const likeIconClasses = likeIcon.classList
@@ -263,18 +294,22 @@ likeIcon.addEventListener('click', async (e) => {
     const addToFavorites = likeIconClasses.toggle('add-to-favorites')
     if (addToFavorites) {
         added = await addedToFavs(e.target.parentElement.id)
-        console.log(added)
+        // console.log(added)
     } else {
-        const removed = await removeFromFavs(added)
-        console.log(removed)
+        await removeFromFavs(added)
+        // console.log(removed)
     }
 })
 
 //Display the favorites data on button click
 showFavsBtn.addEventListener('click', async () => {
+    // loading = true
+    // isLoading(true)
     const favsData = await getFavs()
     if (favsData.length === 0) {
+        renderFavsContainer.classList.remove('display-more-data')
         renderFavsContainer.classList.add('no-favorites')
+        isLoading(false)
         return
     } else {
         renderFavsContainer.classList.remove('no-favorites')
@@ -296,7 +331,7 @@ showFavsBtn.addEventListener('click', async () => {
     //called. Call binarySearch on this array to find the correct object,
     //get the image info from this object.
 
-    //A for loop helps with styling when the favsData array is < 3 elements
+    //A for loop helps with styling when the favsData array is < 3 elements long
     //The empty containers should have a display: none
 
     for (let i = 0; i < 3; i++) {
@@ -317,6 +352,7 @@ showFavsBtn.addEventListener('click', async () => {
             favoritesContainers[i].classList.add('no-data')
         }
     }
+    // isLoading(false)
 })
 
 //Remove a favorite on button click

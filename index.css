@@ -131,7 +131,7 @@ main.display-more-data {
     align-self: flex-end;
 }
 
-#close-icon:hover {
+#close-icon.mouse-over {
     color: #ff0000;
 }
 
@@ -182,4 +182,28 @@ main.display-more-data {
 
 .favorites-data img {
     width: 40%;
+    margin-bottom: 10px;
+}
+
+#spinner {
+    display: none;
+}
+
+#spinner.is-loading {
+    /* width: 100%;
+    height: 100%; */
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #77889966; /* rgba(119, 136, 153, 0.4) */
+    z-index: 1;
+}
+
+#spinner i {
+    color: #fafad2;
 }
