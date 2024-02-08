@@ -5,8 +5,8 @@
 
 * {
     box-sizing: border-box;
-    /* margin: 0; */
-    /* padding: 0; */
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -18,9 +18,10 @@ body {
 }
 
 header {
-    width: 100%;
+    width: 99%;
     border-radius: 10px;
     box-shadow: 0 2px 8px #fad2d2;
+    padding: 10px 0px;
 }
 
 h1 {
@@ -34,6 +35,11 @@ button {
     border-radius: 11px;
     border: 2px solid #fad2d2;
     background-color: #fafad280;
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: default;
 }
 
 .favorites-data button {
@@ -57,7 +63,7 @@ main {
     grid-template-rows: 1fr;
     grid-template-columns: 1fr;
     gap: 10px;
-    margin-bottom: 30px;
+    margin: 30px 0;
 }
 
 main.display-more-data {
@@ -118,6 +124,11 @@ main.display-more-data {
     width: 150px;
 }
 
+.name-image p,
+.more-info-container p {
+    margin: 1em 0px;
+}
+
 .dog-name,
 .more-info-icon {
     text-align: center;
@@ -125,7 +136,7 @@ main.display-more-data {
 
 .more-info-icon i,
 #close-icon,
-#like-icon {
+.more-info-container p:nth-child(4) i {
     cursor: pointer;
 }
 
