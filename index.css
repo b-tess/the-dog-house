@@ -5,11 +5,16 @@
 
 * {
     box-sizing: border-box;
+    /* margin: 0; */
+    /* padding: 0; */
 }
 
 body {
     /* width: 100vw; */
     background-color: #fafad2;
+    position: relative;
+    min-height: 100vh;
+    /* margin: 0; */
 }
 
 header {
@@ -139,7 +144,7 @@ main.display-more-data {
     width: 400px;
 }
 
-#like-icon.add-to-favorites {
+.more-info-container p:nth-child(4) i.add-to-favorites {
     color: #ff0000;
 }
 
@@ -201,7 +206,7 @@ main.display-more-data {
     justify-content: center;
     align-items: center;
     background-color: #77889966; /* rgba(119, 136, 153, 0.4) */
-    z-index: 1;
+    /* z-index: 1; */
 }
 
 #spinner i {

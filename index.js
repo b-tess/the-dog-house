@@ -5,7 +5,7 @@ const favoritesContainers = document.getElementsByClassName('favorites-data')
 const renderFavsContainer = document.querySelector('.render-favorites')
 const moreInfoIcons = document.querySelectorAll('.name-image .more-info-icon i')
 const closeIcon = document.getElementById('close-icon')
-const likeIcon = document.getElementById('like-icon')
+// const likeIcon = moreInfoContainer.children[3].firstElementChild
 const main = document.querySelector('main')
 const btnNext = document.getElementById('next')
 const btnPrev = document.getElementById('prev')
@@ -15,7 +15,8 @@ const dogData = document.querySelector('.data')
 const spinner = document.getElementById('spinner')
 let allBreedsArray
 let copyOfDogsArray
-let added
+let likedImagesArray
+// let added
 
 let page = 0
 
@@ -138,9 +139,9 @@ async function addedToFavs(id) {
 async function removeFromFavs(id) {
     try {
         isLoading(true)
-        if (likeIcon.classList.contains('add-to-favorites')) {
-            likeIcon.classList.remove('add-to-favorites')
-        }
+        // if (likeIcon.classList.contains('add-to-favorites')) {
+        //     likeIcon.classList.remove('add-to-favorites')
+        // }
         await fetch(
             `https://api.thedogapi.com/v1/favourites/${id}`,
             removeConfig
@@ -167,8 +168,8 @@ async function getFavs() {
         return data
     } catch (error) {
         console.log(error)
-        isLoading(false)
     }
+    isLoading(false)
 }
 
 //Abstract the dispersal of returned data to relevant elements using context
@@ -210,7 +211,40 @@ function disperseMoreInfo(container) {
     container.children[1].textContent = this.name
     container.children[2].setAttribute('src', `${this.image.url}`)
     container.children[2].setAttribute('alt', `${this.name}`)
-    container.children[3].setAttribute('id', `${this.id}`)
+
+    //Create a new like icon for every dog info object
+    //This will help with keeping the styling unique
+    //to a clicked icon leaving the other info objects
+    //untouched.
+    //This is because multiple info objects are using the same container
+    //to display their different information.
+    //This created a bug where the like icon is affected globally if
+    //it is statically available in the HTML document.
+    //Solution: create the icon dynamically in JS and give each
+    //individual one it's own click event handler.
+    const iconContainer = container.children[3]
+    if (iconContainer.childElementCount > 0) {
+        //Remove any previously present icon before creating a new one
+        const prevLikeIcon = iconContainer.firstElementChild
+        // console.log(prevLikeIcon)
+        prevLikeIcon.remove()
+    }
+    const likeIcon = document.createElement('i')
+    likeIcon.setAttribute('id', `${this.id}`)
+    likeIcon.classList.add('fa-regular', 'fa-heart', 'fa-lg')
+
+    //Check if this current dog info object is present in the array
+    //of liked images so as to maintain the styling & functionality
+    //of the like icon
+    if (likedImagesArray.length > 0) {
+        likedImagesArray.forEach((image) => {
+            if (parseInt(image.image_id) === this.id) {
+                likeIcon.classList.add('add-to-favorites')
+            }
+        })
+    }
+    iconContainer.appendChild(likeIcon)
+
     //Placeholder for objects without origin data
     if (this.origin === '' || this.origin === undefined) {
         container.children[4].textContent = 'Origin: unknown'
@@ -221,6 +255,8 @@ function disperseMoreInfo(container) {
     container.children[5].textContent = `Life Expectancy: ${this.life_span}`
     container.children[6].textContent = `Bred For: ${this.bred_for}`
     container.children[7].textContent = `Temperament: ${this.temperament}`
+
+    likeIcon.addEventListener('click', () => likeHandler(likeIcon))
 }
 
 //Distribute the favorites data
@@ -249,7 +285,7 @@ btnPrev.addEventListener('click', () => {
 })
 
 moreInfoIcons.forEach((icon) => {
-    icon.addEventListener('click', (e) => {
+    icon.addEventListener('click', async (e) => {
         //Add a class that affects the page layout
         main.classList.add('display-more-data')
         moreInfoContainer.classList.add('display-more-data')
@@ -263,7 +299,13 @@ moreInfoIcons.forEach((icon) => {
             e.target.parentElement.id
         )
 
-        // console.log(dogDataObj)
+        // console.log('dog data obj', dogDataObj)
+
+        //Populate the liked images array to help with styling
+        //the like icon of images already liked
+        const likedData = await getFavs()
+        likedImagesArray = [...likedData]
+        // console.log(likedImagesArray)
 
         disperseMoreInfo.call(dogDataObj, moreInfoContainer)
     })
@@ -287,25 +329,32 @@ closeIcon.addEventListener('mouseout', () => {
     closeIcon.classList.remove('mouse-over')
 })
 
-//Toggle the styling of the like-icon
-//Use th icon to add or remove an image from the favorites list
-const likeIconClasses = likeIcon.classList
-likeIcon.addEventListener('click', async (e) => {
-    const addToFavorites = likeIconClasses.toggle('add-to-favorites')
+//Abstract the functionality of the like icon click event
+async function likeHandler(element) {
+    //Toggle the styling of the like-icon
+    const addToFavorites = element.classList.toggle('add-to-favorites')
+
+    //Use the icon to add or remove an image from the favorites list
     if (addToFavorites) {
-        added = await addedToFavs(e.target.parentElement.id)
+        await addedToFavs(element.id)
         // console.log(added)
     } else {
-        await removeFromFavs(added)
-        // console.log(removed)
+        // console.log(likedImagesArray)
+        const images = await getFavs()
+        images.forEach((image) => {
+            if (image.image_id === element.id) {
+                removeFromFavs(image.id)
+            }
+        })
+        // await removeFromFavs(added)
     }
-})
+}
 
 //Display the favorites data on button click
 showFavsBtn.addEventListener('click', async () => {
-    // loading = true
-    // isLoading(true)
+    isLoading(true)
     const favsData = await getFavs()
+    // console.log('favs data', favsData)
     if (favsData.length === 0) {
         renderFavsContainer.classList.remove('display-more-data')
         renderFavsContainer.classList.add('no-favorites')
@@ -352,14 +401,14 @@ showFavsBtn.addEventListener('click', async () => {
             favoritesContainers[i].classList.add('no-data')
         }
     }
-    // isLoading(false)
+    isLoading(false)
 })
 
 //Remove a favorite on button click
 removeFavsBtns.forEach((button) => {
     button.addEventListener('click', async (e) => {
-        const deleted = await removeFromFavs(e.target.id)
-        console.log(deleted)
+        await removeFromFavs(e.target.id)
+        // console.log(deleted)
         clearFavsData(e.target.parentElement)
     })
 })
