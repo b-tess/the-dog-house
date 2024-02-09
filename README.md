@@ -40,3 +40,7 @@ JavaScript.
 This is what the application's landing page looks like.
 
 <![The Dog House landing page](./images/the-dog-house.png)>
+
+### Developed by:
+
+Barbara Tess Ndiba

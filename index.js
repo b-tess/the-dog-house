@@ -1,3 +1,4 @@
+const myKey = config.MY_API_KEY
 const nameImageContainers = document.querySelectorAll('.name-image')
 const moreInfoContainer = document.querySelector('.more-info-container')
 const imagesContainer = document.querySelector('.images-container')
@@ -5,7 +6,6 @@ const favoritesContainers = document.getElementsByClassName('favorites-data')
 const renderFavsContainer = document.querySelector('.render-favorites')
 const moreInfoIcons = document.querySelectorAll('.name-image .more-info-icon i')
 const closeIcon = document.getElementById('close-icon')
-// const likeIcon = moreInfoContainer.children[3].firstElementChild
 const main = document.querySelector('main')
 const btnNext = document.getElementById('next')
 const btnPrev = document.getElementById('prev')
@@ -16,7 +16,6 @@ const spinner = document.getElementById('spinner')
 let allBreedsArray
 let copyOfDogsArray
 let likedImagesArray
-// let added
 
 let page = 0
 
@@ -25,8 +24,7 @@ const getBreedsConfig = {
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'x-api-key':
-            'live_RccA1xjRZi83cXhCxXEAUzBSAcNGtBepp8AenZHiUmMScC2it42WhVD3zyYJGDoe',
+        'x-api-key': myKey,
     },
 }
 
@@ -35,8 +33,7 @@ const addToFavoritesConfig = {
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'x-api-key':
-            'live_RccA1xjRZi83cXhCxXEAUzBSAcNGtBepp8AenZHiUmMScC2it42WhVD3zyYJGDoe',
+        'x-api-key': myKey,
     },
     body: {},
 }
@@ -45,11 +42,11 @@ const removeConfig = {
     method: 'DELETE',
     headers: {
         'Content-Type': 'application/json',
-        'x-api-key':
-            'live_RccA1xjRZi83cXhCxXEAUzBSAcNGtBepp8AenZHiUmMScC2it42WhVD3zyYJGDoe',
+        'x-api-key': myKey,
     },
 }
 
+//Set up a spinner while the data is being fetched
 function isLoading(loading = true) {
     if (loading) {
         spinner.classList.add('is-loading')
@@ -139,14 +136,11 @@ async function addedToFavs(id) {
 async function removeFromFavs(id) {
     try {
         isLoading(true)
-        // if (likeIcon.classList.contains('add-to-favorites')) {
-        //     likeIcon.classList.remove('add-to-favorites')
-        // }
+
         await fetch(
             `https://api.thedogapi.com/v1/favourites/${id}`,
             removeConfig
         )
-        // return deleted
     } catch (error) {
         console.log(error)
     }
@@ -172,7 +166,7 @@ async function getFavs() {
     isLoading(false)
 }
 
-//Abstract the dispersal of returned data to relevant elements using context
+//Abstract the dispersal of returned breeds data to relevant elements using context
 function disperseBreedsData(container) {
     container.children[0].setAttribute('src', `${this.image.url}`)
     container.children[0].setAttribute('alt', `${this.name}`)
@@ -189,8 +183,8 @@ function clearBreedsData(container) {
     container.children[1].textContent = ''
 }
 
+//Find the correct object to display using binary search
 function binarySearch(array, id) {
-    //Find the correct object to display using binary search?
     let start = 0
     let end = array.length //This is an array of objects
 
@@ -226,7 +220,6 @@ function disperseMoreInfo(container) {
     if (iconContainer.childElementCount > 0) {
         //Remove any previously present icon before creating a new one
         const prevLikeIcon = iconContainer.firstElementChild
-        // console.log(prevLikeIcon)
         prevLikeIcon.remove()
     }
     const likeIcon = document.createElement('i')
@@ -268,9 +261,6 @@ function disperseFavsData(container) {
 
 //Clear the favorites data on click of remove button
 function clearFavsData(container) {
-    // container.children[0].setAttribute('src', '')
-    // container.children[0].setAttribute('alt', '')
-    // container.children[1].setAttribute('id', '')
     container.classList.add('no-data')
 }
 
@@ -290,22 +280,17 @@ moreInfoIcons.forEach((icon) => {
         main.classList.add('display-more-data')
         moreInfoContainer.classList.add('display-more-data')
         imagesContainer.classList.add('display-more-data')
-        // nameImageContainers.forEach((container) =>
-        //     container.classList.add('display-more-data')
-        // )
+
         //Find correct element in the array to help with dispersing the data
         const dogDataObj = binarySearch(
             copyOfDogsArray,
             e.target.parentElement.id
         )
 
-        // console.log('dog data obj', dogDataObj)
-
         //Populate the liked images array to help with styling
         //the like icon of images already liked
         const likedData = await getFavs()
         likedImagesArray = [...likedData]
-        // console.log(likedImagesArray)
 
         disperseMoreInfo.call(dogDataObj, moreInfoContainer)
     })
@@ -316,9 +301,6 @@ closeIcon.addEventListener('click', () => {
     main.classList.remove('display-more-data')
     moreInfoContainer.classList.remove('display-more-data')
     imagesContainer.classList.remove('display-more-data')
-    // nameImageContainers.forEach((container) =>
-    //     container.classList.remove('display-more-data')
-    // )
 })
 
 closeIcon.addEventListener('mouseover', () => {
@@ -331,22 +313,19 @@ closeIcon.addEventListener('mouseout', () => {
 
 //Abstract the functionality of the like icon click event
 async function likeHandler(element) {
-    //Toggle the styling of the like-icon
+    //Toggle the styling of the like icon
     const addToFavorites = element.classList.toggle('add-to-favorites')
 
     //Use the icon to add or remove an image from the favorites list
     if (addToFavorites) {
         await addedToFavs(element.id)
-        // console.log(added)
     } else {
-        // console.log(likedImagesArray)
         const images = await getFavs()
         images.forEach((image) => {
             if (image.image_id === element.id) {
                 removeFromFavs(image.id)
             }
         })
-        // await removeFromFavs(added)
     }
 }
 
@@ -354,7 +333,6 @@ async function likeHandler(element) {
 showFavsBtn.addEventListener('click', async () => {
     isLoading(true)
     const favsData = await getFavs()
-    // console.log('favs data', favsData)
     if (favsData.length === 0) {
         renderFavsContainer.classList.remove('display-more-data')
         renderFavsContainer.classList.add('no-favorites')
@@ -371,8 +349,6 @@ showFavsBtn.addEventListener('click', async () => {
         },
         favId: '',
     }
-    // console.log('favs data', favsData)
-    // console.log(favoritesContainers)
 
     //The favs data returned doesn't seem to have the image property needed
     //to disperse the data correctly.
@@ -408,10 +384,9 @@ showFavsBtn.addEventListener('click', async () => {
 removeFavsBtns.forEach((button) => {
     button.addEventListener('click', async (e) => {
         await removeFromFavs(e.target.id)
-        // console.log(deleted)
         clearFavsData(e.target.parentElement)
     })
 })
 
-// getAllDogBreeds()
+//Initialize the application
 get5DogObjects()
